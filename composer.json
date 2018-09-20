@@ -28,7 +28,7 @@
     "extra": {
         "name": "TDE - Geo Address Fields",
         "handle": "geoaddress",
-        "schemaVersion": "1.0.1",
+        "schemaVersion": "1.0.10",
         "hasCpSettings": true,
         "hasCpSection": false,
         "changelogUrl": "https://raw.githubusercontent.com/Dunckelfeld/craftplugin-geoaddress/master/CHANGELOG.md",
