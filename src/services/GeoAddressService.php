@@ -45,10 +45,10 @@ class GeoAddressService extends Component
   			'countryCode' => null,
 	    ];
 
-      // Create a stream
       $opts = array('http'=>array('header'=>"User-Agent: AddressScript\r\n"));
       $context = stream_context_create($opts);
-      $requestUrl = 'https://nominatim.openstreetmap.org/search/' . rawurlencode($value['street'].' '.$value['zip']) . '?format=json';
+      $searchString = $value['street'].' '.$value['zip'].' '.$value['city'].' '.$value['country'];
+      $requestUrl = 'https://nominatim.openstreetmap.org/search/' . rawurlencode($searchString) . '?format=json';
       $rawResult = file_get_contents($requestUrl, false, $context);
   		$result = json_decode($rawResult);
 
