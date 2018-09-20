@@ -1,10 +1,10 @@
 {
-    "name": "Dunckelfeld/craftplugin-geoaddress",
+    "name": "tde/craftplugin-geoaddress",
     "description": "Geo Address fields for Craft Sections",
     "type": "craft-plugin",
     "support": {
-        "docs": "https://github.com/Dunckelfeld/craftplugin-geoaddress/blob/master/README.md",
-        "issues": "https://github.com/Dunckelfeld/craftplugin-geoaddress/issues"
+        "docs": "https://github.com/tdeNL/craftplugin-geoaddress/blob/master/README.md",
+        "issues": "https://github.com/tdeNL/craftplugin-geoaddress/issues"
     },
     "license": "MIT",
     "authors": [
@@ -31,7 +31,7 @@
         "schemaVersion": "1.0.10",
         "hasCpSettings": true,
         "hasCpSection": false,
-        "changelogUrl": "https://raw.githubusercontent.com/Dunckelfeld/craftplugin-geoaddress/master/CHANGELOG.md",
+        "changelogUrl": "https://raw.githubusercontent.com/tdeNL/craftplugin-geoaddress/master/CHANGELOG.md",
         "components": {
             "geoAddressService": "TDE\\GeoAddress\\services\\GeoAddressService"
         },
