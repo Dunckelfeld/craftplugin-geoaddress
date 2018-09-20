@@ -15,7 +15,7 @@
         {
             "name": "Dunckelfeld",
             "homepage": "http://www.dunckelfeld.de"
-        },
+        }
     ],
     "require": {
         "craftcms/cms": "^3.0.0-RC1"
@@ -28,7 +28,7 @@
     "extra": {
         "name": "TDE - Geo Address Fields",
         "handle": "geoaddress",
-        "schemaVersion": "1.0",
+        "schemaVersion": "1.0.1",
         "hasCpSettings": true,
         "hasCpSection": false,
         "changelogUrl": "https://raw.githubusercontent.com/Dunckelfeld/craftplugin-geoaddress/master/CHANGELOG.md",
