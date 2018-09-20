@@ -18,12 +18,18 @@ class GeoAddressSettingsModel extends Model
 	public $googleApiKey;
 
 	/**
+	 * @var string
+	 */
+	public $geocoderService;
+
+	/**
 	 * @return array
 	 */
 	public function rules()
 	{
 		return [
-			['googleApiKey', 'string']
+			['googleApiKey', 'string'],
+			['geocoderService', 'string']
 		];
 	}
 }

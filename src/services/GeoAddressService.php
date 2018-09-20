@@ -19,70 +19,138 @@ class GeoAddressService extends Component
 	 */
     public function getCoordsByAddress(array $value)
     {
+        $geocoderService = GeoAddress::getInstance()->getSettings()->geocoderService;
+
+        if($geocoderService == 'google') {
+          $address = $this->getCoordsByAddressGoogle($value);
+        } else {
+          $address = $this->getCoordsByAddressOpenStreetMap($value);
+        }
+
+		    return $address;
+    }
+
+	/**
+	 * @param array $value
+	 * @return array
+	 */
+    public function getCoordsByAddressOpenStreetMap(array $value)
+    {
+
     	$address = [
     		'lat' => null,
-			'lng' => null,
-			'formattedAddress' => null,
-			'countryName' => null,
-			'countryCode' => null,
-		];
+  			'lng' => null,
+  			'formattedAddress' => null,
+  			'countryName' => null,
+  			'countryCode' => null,
+	    ];
 
-		$requestUrl = 'https://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=' . urlencode(json_encode($value)) . '&key=' . GeoAddress::getInstance()->getSettings()->googleApiKey;
-		$result = json_decode(file_get_contents($requestUrl));
+      // Create a stream
+      $opts = array('http'=>array('header'=>"User-Agent: AddressScript\r\n"));
+      $context = stream_context_create($opts);
+      $requestUrl = 'https://nominatim.openstreetmap.org/search/' . rawurlencode($value['street'].' '.$value['zip']) . '?format=json';
+      $rawResult = file_get_contents($requestUrl, false, $context);
+  		$result = json_decode($rawResult);
 
-		// no results
-		if ($result->status !== 'OK' || empty($result->results)) {
-			Craft::warning(
-				Craft::t(
-					'geoaddress',
-					'GeoAddress coding failed: ' . $result->status
-				),
-				__METHOD__
-			);
+  		// no results
+  		if (empty($result)) {
+  			Craft::warning(
+  				Craft::t(
+  					'geoaddress',
+  					'GeoAddress coding failed'
+  				),
+  				__METHOD__
+  			);
+  			return $address;
+  		}
 
-			return $address;
-		}
+          // get the geometry
+          if (isset($result[0]->lat) && isset($result[0]->lon) ) {
+              $address['lat'] = $result[0]->lat;
+              $address['lng'] = $result[0]->lon;
+          }
 
-        $addressComponent = null;
-        foreach ($result->results as $addressResult) {
-            foreach ($addressResult->address_components as $component) {
-                if (!in_array('country', $component->types)) {
-                    continue;
-                }
-
-                if ($component->long_name !== $value['country']) {
-                    continue;
-                }
-
-                $addressComponent = $addressResult;
-                break 2;
-            }
-        }
-
-        // get the country name & code
-        if (isset($addressComponent->address_components)) {
-            foreach ($addressComponent->address_components as $component) {
-                if (count($component->types) === 0 || $component->types[0] !== 'country') {
-                    continue;
-                }
-
-                $address['countryName'] = $component->long_name;
-                $address['countryCode'] = $component->short_name;
-            }
-        }
-
-        // get the geometry
-        if (isset($addressComponent->geometry)) {
-            $address['lat'] = $addressComponent->geometry->location->lat;
-            $address['lng'] = $addressComponent->geometry->location->lng;
-        }
-
-        if (isset($addressComponent->formatted_address)) {
-            $address['formattedAddress'] = $addressComponent->formatted_address;
-        }
-
-		return $address;
+          if (isset($result[0]->display_name)) {
+              $address['formattedAddress'] = $result[0]->display_name;
+          }
+  		return $address;
     }
+
+
+
+	/**
+	 * @param array $value
+	 * @return array
+	 */
+    public function getCoordsByAddressGoogle(array $value)
+    {
+      $address = [
+        'lat' => null,
+        'lng' => null,
+        'formattedAddress' => null,
+        'countryName' => null,
+        'countryCode' => null,
+      ];
+
+      $requestUrl = 'https://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=' . urlencode(json_encode($value)) . '&key=' . GeoAddress::getInstance()->getSettings()->googleApiKey;
+      $result = json_decode(file_get_contents($requestUrl));
+
+      // no results
+      if ($result->status !== 'OK' || empty($result->results)) {
+        Craft::warning(
+          Craft::t(
+            'geoaddress',
+            'GeoAddress coding failed: ' . $result->status
+          ),
+          __METHOD__
+        );
+
+        return $address;
+      }
+
+      $addressComponent = null;
+      foreach ($result->results as $addressResult) {
+          foreach ($addressResult->address_components as $component) {
+              if (!in_array('country', $component->types)) {
+                  continue;
+              }
+
+              if ($component->long_name !== $value['country']) {
+                  continue;
+              }
+
+              $addressComponent = $addressResult;
+              break 2;
+          }
+      }
+
+      // get the country name & code
+      if (isset($addressComponent->address_components)) {
+          foreach ($addressComponent->address_components as $component) {
+              if (count($component->types) === 0 || $component->types[0] !== 'country') {
+                  continue;
+              }
+
+              $address['countryName'] = $component->long_name;
+              $address['countryCode'] = $component->short_name;
+          }
+      }
+
+      // get the geometry
+      if (isset($addressComponent->geometry)) {
+          $address['lat'] = $addressComponent->geometry->location->lat;
+          $address['lng'] = $addressComponent->geometry->location->lng;
+      }
+
+      if (isset($addressComponent->formatted_address)) {
+          $address['formattedAddress'] = $addressComponent->formatted_address;
+      }
+
+
+	    return $address;
+    }
+
+
 
 	/**
 	 * Filter the given entries with the latitude & longitude
